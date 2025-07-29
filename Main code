@@ -1,0 +1,61 @@
+import customtkinter as ctk
+from tkinter import messagebox
+
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("blue")
+
+app = ctk.CTk()
+app.title("To-Do List")
+app.geometry("400x550")
+app.configure(fg_color="#2d004d")  # Dark purple
+
+tasks = []
+
+def add_task():
+    task_text = entry.get().strip()
+    if not task_text:
+        messagebox.showwarning("Empty Task", "Enter a task first.")
+        return
+    task = {"text": task_text, "done": False}
+    tasks.append(task)
+    entry.delete(0, 'end')
+    update_tasks()
+
+def toggle_done(index):
+    tasks[index]["done"] = not tasks[index]["done"]
+    update_tasks()
+
+def delete_task(index):
+    del tasks[index]
+    update_tasks()
+
+def update_tasks():
+    for widget in task_frame.winfo_children():
+        widget.destroy()
+    for i, task in enumerate(tasks):
+        task_text = f"✓ {task['text']}" if task["done"] else task["text"]
+        color = "#aaa" if task["done"] else "#fff"
+        label = ctk.CTkLabel(task_frame, text=task_text, text_color=color, font=ctk.CTkFont(size=14))
+        label.grid(row=i, column=0, sticky="w", padx=5, pady=5)
+
+        done_btn = ctk.CTkButton(task_frame, text="✓", width=30, command=lambda i=i: toggle_done(i), fg_color="#4CAF50")
+        done_btn.grid(row=i, column=1, padx=5)
+
+        del_btn = ctk.CTkButton(task_frame, text="🗑", width=30, command=lambda i=i: delete_task(i), fg_color="#E53935")
+        del_btn.grid(row=i, column=2, padx=5)
+
+# Title
+ctk.CTkLabel(app, text="📝 To-Do List", font=ctk.CTkFont(size=22, weight="bold"), text_color="#ffffff").pack(pady=15)
+
+# Entry
+entry = ctk.CTkEntry(app, placeholder_text="Enter task...", width=300, text_color="#ffffff")
+entry.pack(pady=10)
+
+# Add button
+ctk.CTkButton(app, text="Add Task", command=add_task, fg_color="#7e1fa6").pack(pady=5)
+
+# Scrollable task list
+task_frame = ctk.CTkScrollableFrame(app, width=360, height=360, fg_color="#3a0057", corner_radius=10)
+task_frame.pack(pady=10)
+
+app.mainloop()
